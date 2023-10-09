@@ -15,6 +15,11 @@ use App\Http\Controllers\ProjectController;
 |
 */
 
+Route::get('/', [TaskController::class, 'index']);
 
 Route::resource('task', TaskController::class);
 Route::resource('project', ProjectController::class);
+
+// Update priority coming from Ajax request
+Route::post('/update-priority', 'TaskController@updatePriority')->name('update-priority')->middleware('web');
+

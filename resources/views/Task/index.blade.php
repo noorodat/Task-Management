@@ -8,7 +8,7 @@
 
 <h1 class="text-center mt-3">Tasks</h1>
 
-@if (count($tasks) > 0) {
+@if (count($tasks) > 0)
     <div class="tasks p-4">
         <form action="" class="p-4">
             <select name="" id="">
@@ -27,7 +27,7 @@
             </thead>
             <tbody>
                 @foreach ($tasks as $task)
-                <tr id="{{$task->id}}">
+                <tr id="{{$task->priority}}">
                     <td>{{$task->name}}</td>
                     <td>{{$task->project->name}}</td>
                     <td>{{$task->priority}}</td>
@@ -41,7 +41,6 @@
             </tbody>
         </table>
     </div>
-}
 
 @else {
     <h3 class="text-center p-4 mt-4">You have no tasks</h3>

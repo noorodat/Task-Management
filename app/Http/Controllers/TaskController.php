@@ -35,7 +35,7 @@ class TaskController extends Controller
         $taskCount = Task::count();
         $lastTask = Task::latest()->first();
 
-        if($lastTask) {
+        if ($lastTask) {
             $priortry = $taskCount + 1;
         } else {
             $priortry = 1;
@@ -55,7 +55,16 @@ class TaskController extends Controller
         flash()->addSuccess('Task added');
 
         return redirect()->back();
+    }
 
+    public function updatePriority(Request $request)
+    {
+        $swappedPriority = $request->input('swappedPriority');
+        $draggedPriority = $request->input('draggedPriority');
+    
+        dd($swappedPriority);
+    
+        return response()->json(['message' => 'Priority updated successfully']);
     }
 
     /**

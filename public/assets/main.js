@@ -53,15 +53,32 @@
         });
     };
 
+    let swappedElementPriority = null;
+    let draggedElementPriority = null
+
+    const setSwappedElementsPriority = (swappedPriority, draggedPriority) => {
+        swappedElementPriority = swappedPriority;
+        draggedElementPriority = draggedPriority
+    }
+
+    const getSwappedElementsPriority = () => {
+        return [swappedElementPriority, draggedElementPriority];
+    }
+
     const swapRow = (row, index) => {
         const currIndex = Array.from(tbody.children).indexOf(currRow);
         const row1 = currIndex > index ? currRow : row;
         const row2 = currIndex > index ? row : currRow;
 
         tbody.insertBefore(row1, row2);
+
+        setSwappedElementsPriority(row1.id, row2.id);
+
     };
+    
 
     const moveRow = (x, y) => {
+
         dragElem.style.transform = `translate3d(${x}px, ${y}px, 0)`;
 
         const dPos = dragElem.getBoundingClientRect();
@@ -74,16 +91,17 @@
             const rowSize = rowElem.getBoundingClientRect();
             const rowStartY = rowSize.y;
             const rowEndY = rowStartY + rowSize.height;
-
             if (
                 currRow !== rowElem &&
                 isIntersecting(currStartY, currEndY, rowStartY, rowEndY)
             ) {
-                if (Math.abs(currStartY - rowStartY) < rowSize.height / 2)
+                if (Math.abs(currStartY - rowStartY) < rowSize.height / 2) {
                     swapRow(rowElem, i);
+                }
             }
         }
     };
+
 
     const addDraggableRow = (target) => {
         dragElem = target.cloneNode(true);
@@ -98,14 +116,14 @@
             newTD.style.padding = getStyle(oldTD, "padding");
             newTD.style.margin = getStyle(oldTD, "margin");
         }
-
+    
         table.appendChild(dragElem);
-
+    
         const tPos = target.getBoundingClientRect();
         const dPos = dragElem.getBoundingClientRect();
         dragElem.style.bottom = `${dPos.y - tPos.y - tPos.height}px`;
         dragElem.style.left = "-1px";
-
+    
         document.dispatchEvent(
             new MouseEvent("mousemove", {
                 view: window,
@@ -113,7 +131,36 @@
                 bubbles: true,
             })
         );
+    
+        // Send AJAX request (update priority) on mouseup event
+        dragElem.addEventListener("mouseup", () => {
+            let swappedPriority = getSwappedElementsPriority()[0];
+            let draggedPriority = getSwappedElementsPriority()[1];
+        
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        
+            // Send an Ajax POST request to the Laravel route
+            $.ajax({
+                type: 'POST',
+                url: '/update-priority',
+                data: {
+                    swappedPriority: swappedPriority,
+                    draggedPriority: draggedPriority, 
+                },
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function(response) {                   
+                    console.log(response.message);
+                },
+                error: function(error) {                 
+                    console.error('Error:', error);
+                }
+            });
+        });
+        
     };
+    
 
     const getRows = () => {
         return table.querySelectorAll("tbody tr");
@@ -151,34 +198,28 @@
 })();
 
 
-/* 
 
-
-document.addEventListener("drop", (event) => {
-    event.preventDefault();
+// document.addEventListener("drop", (event) => {
+//     event.preventDefault();
     
-    // Find the target row where you're dropping
-    const targetRow = getTargetRow(event.target);
+//     // Find the target row where you're dropping
+//     const targetRow = getTargetRow(event.target);
     
-    // Check if the targetRow is not null and it has a unique ID
-    if (targetRow && targetRow.id) {
-        const droppedRowId = currRow.id; // Get the ID of the row being dragged
+//     // Check if the targetRow is not null and it has a unique ID
+//     if (targetRow && targetRow.id) {
+//         const droppedRowId = currRow.id; // Get the ID of the row being dragged
+//         // Now, you have the ID of the row being dragged and the ID of the target row.
+//         // You can implement your logic here to handle the drop action.
+//         // For example, you can swap the data associated with these two rows.
+//         // Here's a basic example of swapping IDs:
         
-        // Now, you have the ID of the row being dragged and the ID of the target row.
-        // You can implement your logic here to handle the drop action.
-        // For example, you can swap the data associated with these two rows.
-        // Here's a basic example of swapping IDs:
+//         // Save the original ID of the target row
+//         const originalTargetRowId = targetRow.id;
         
-        // Save the original ID of the target row
-        const originalTargetRowId = targetRow.id;
+//         // Set the ID of the target row to the ID of the dragged row
+//         targetRow.id = droppedRowId;
         
-        // Set the ID of the target row to the ID of the dragged row
-        targetRow.id = droppedRowId;
-        
-        // Set the ID of the dragged row to the original ID of the target row
-        currRow.id = originalTargetRowId;
-    }
-});
-
-
-*/
+//         // Set the ID of the dragged row to the original ID of the target row
+//         currRow.id = originalTargetRowId;
+//     }
+// });
