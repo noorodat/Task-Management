@@ -8,63 +8,46 @@
 
 <h1 class="text-center mt-3">Tasks</h1>
 
-<div class="tasks p-4">
-    <table id="table" class="draggable-table table table-dark table-hover text-center">
-        <thead>
-            <th>Task Name</th>
-            <th>Craeted at</th>
-            <th>Priority</th>
-            <th>Action</th>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Task1</td>
-                <td>Today</td>
-                <td>1</td>
-                <td>
-                    <a href="" class="btn btn-primary">Edit</a>
-                    <a href="" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-            <tr>
-                <td>Task2</td>
-                <td>Today</td>
-                <td>2</td>
-                <td>
-                    <a href="" class="btn btn-primary">Edit</a>
-                    <a href="" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-            <tr>
-                <td>Task3</td>
-                <td>Today</td>
-                <td>3</td>
-                <td>
-                    <a href="" class="btn btn-primary">Edit</a>
-                    <a href="" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-            <tr>
-                <td>Task4</td>
-                <td>Today</td>
-                <td>4</td>
-                <td>
-                    <a href="" class="btn btn-primary">Edit</a>
-                    <a href="" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-            <tr>
-                <td>Task5</td>
-                <td>Today</td>
-                <td>5</td>
-                <td>
-                    <a href="" class="btn btn-primary">Edit</a>
-                    <a href="" class="btn btn-danger">Delete</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+@if (count($tasks) > 0) {
+    <div class="tasks p-4">
+        <form action="" class="p-4">
+            <select name="" id="">
+                <option value="">Select a project</option>
+                <option value="">Project1</option>
+                <option value="">Project2</option>
+                <option value="">Project3</option>
+            </select>
+        </form>
+        <table id="table" class="draggable-table table table-dark table-hover text-center">
+            <thead>
+                <th>Task Name</th>
+                <th>Project</th>
+                <th>Priority</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                @foreach ($tasks as $task)
+                <tr id="{{$task->id}}">
+                    <td>{{$task->name}}</td>
+                    <td>{{$task->project->name}}</td>
+                    <td>{{$task->priority}}</td>
+                    <td>
+                        {{-- {{route('task.edit')}} --}}
+                        <a href="" class="btn btn-primary">Edit</a>
+                        <a href="" class="btn btn-danger">Delete</a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+}
+
+@else {
+    <h3 class="text-center p-4 mt-4">You have no tasks</h3>
+}
+    
+@endif
 
 
 @endsection

@@ -4,10 +4,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{route('home')}}">Home</a>
+                    <a class="nav-link active" aria-current="page" href="{{route('task.index')}}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{route('task.create')}}">Add new task</a>
+                    <a class="nav-link" aria-current="page" href="{{route('project.create')}}">Add project</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{route('task.create')}}">Add task</a>
                 </li>
             </ul>
         </div>

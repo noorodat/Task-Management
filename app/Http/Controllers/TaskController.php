@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\Project;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -12,7 +13,8 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $tasks = Task::orderBy('priority', 'asc')->get();
+        return view('Task.index', compact('tasks'));
     }
 
     /**
@@ -20,7 +22,8 @@ class TaskController extends Controller
      */
     public function create()
     {
-        return view('Task.add');
+        $projects = Project::all();
+        return view('Task.add', compact('projects'));
     }
 
     /**
@@ -28,7 +31,31 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $taskCount = Task::count();
+        $lastTask = Task::latest()->first();
+
+        if($lastTask) {
+            $priortry = $taskCount + 1;
+        } else {
+            $priortry = 1;
+        }
+
+        $request->validate([
+            'task-name' => 'required|string',
+            'project-name' => 'required',
+        ]);
+
+        Task::create([
+            'name' => $request->input('task-name'),
+            'priority' => $priortry,
+            'project_id' => $request->input('project-name'),
+        ]);
+
+        flash()->addSuccess('Task added');
+
+        return redirect()->back();
+
     }
 
     /**
@@ -36,7 +63,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        //
+        return view('Task.edit');
     }
 
     /**

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
+
+    const DEFAULT_COURSE_COUNT = 0;
     /**
      * Display a listing of the resource.
      */
@@ -20,7 +22,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        //
+        return view('Project.add');
     }
 
     /**
@@ -28,7 +30,19 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'projectName' => 'required',
+        ]);
+        
+        Project::create([
+            'name' => $request->input('projectName'),
+            'tasks_count' => self::DEFAULT_COURSE_COUNT,
+        ]);
+
+        flash()->addSuccess('Porject Created');
+
+        return redirect()->back();
+        
     }
 
     /**

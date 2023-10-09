@@ -149,3 +149,36 @@
 
     init();
 })();
+
+
+/* 
+
+
+document.addEventListener("drop", (event) => {
+    event.preventDefault();
+    
+    // Find the target row where you're dropping
+    const targetRow = getTargetRow(event.target);
+    
+    // Check if the targetRow is not null and it has a unique ID
+    if (targetRow && targetRow.id) {
+        const droppedRowId = currRow.id; // Get the ID of the row being dragged
+        
+        // Now, you have the ID of the row being dragged and the ID of the target row.
+        // You can implement your logic here to handle the drop action.
+        // For example, you can swap the data associated with these two rows.
+        // Here's a basic example of swapping IDs:
+        
+        // Save the original ID of the target row
+        const originalTargetRowId = targetRow.id;
+        
+        // Set the ID of the target row to the ID of the dragged row
+        targetRow.id = droppedRowId;
+        
+        // Set the ID of the dragged row to the original ID of the target row
+        currRow.id = originalTargetRowId;
+    }
+});
+
+
+*/
