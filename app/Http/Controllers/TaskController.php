@@ -66,31 +66,26 @@ class TaskController extends Controller
         $recordWithSwappedPriority = Task::where('priority', $swappedPriority)->first();
         $recordWithDraggedPriority = Task::where('priority', $draggedPriority)->first();
     
-        if (!$recordWithDraggedPriority || !$recordWithSwappedPriority) {
-            return response()->json(['message' => 'Invalid priorities provided.']);
-        }
-
         // Get the records in the range
-        $recordsInRange = Task::where('priority', '>', $draggedPriority)
+        $recordsInRangeOnSub = Task::where('priority', '>', $draggedPriority)
         ->where('priority', '<=', $swappedPriority)
         ->get();
-    
-        // Update the dragged priority to the swapped one
-        $recordWithDraggedPriority->update(['priority' => $swappedPriority]);
-        flash()->addInfo("Number is", $swappedPriority);
 
+        $recordsInRangeOnAdd = Task::where('priority', '<', $draggedPriority)
+        ->where('priority', '>=', $swappedPriority)
+        ->get();
+    
         $operation = $draggedPriority > $swappedPriority ? 'add' : 'sub';
 
-        $range = abs($swappedPriority - $draggedPriority);
+        $recordWithDraggedPriority->update(['priority' => $swappedPriority]);
+
 
         if ($operation === 'add') {
-            // Update the priorities of records within the specified range
-            Task::where('priority', '>=', $draggedPriority)
-                ->where('priority', '<=', $swappedPriority)
-                ->where('priority', '!=', $draggedPriority) // Exclude the updated record
-                ->increment('priority', 1);
+            $recordsInRangeOnAdd->each(function ($record) {
+                $record->increment('priority', 1);
+            });
         } elseif ($operation === 'sub') {
-            $recordsInRange->each(function ($record) {
+            $recordsInRangeOnSub->each(function ($record) {
                 $record->decrement('priority', 1);
             });
         }

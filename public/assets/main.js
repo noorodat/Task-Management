@@ -54,11 +54,14 @@
     };
 
     let swappedElementPriority = null;
-    let draggedElementPriority = null
+    let draggedElementPriority = null;
 
-    const setSwappedElementsPriority = (swappedPriority, draggedPriority) => {
+    const setSwappedElementsPriority = (swappedPriority) => {
         swappedElementPriority = swappedPriority;
-        draggedElementPriority = draggedPriority
+    };
+
+    const setDraggingElementId = (id) => {
+        draggedElementPriority = id;
     }
 
     const getSwappedElementsPriority = () => {
@@ -69,11 +72,12 @@
         const currIndex = Array.from(tbody.children).indexOf(currRow);
         const row1 = currIndex > index ? currRow : row;
         const row2 = currIndex > index ? row : currRow;
-
+    
         tbody.insertBefore(row1, row2);
-
-        setSwappedElementsPriority(row1.id, row2.id);
-
+    
+        // Determine the IDs of the swapped elements
+        let swappedPriority = row1.id;
+        // Set swapped and dragged priorities
     };
     
 
@@ -97,6 +101,7 @@
             ) {
                 if (Math.abs(currStartY - rowStartY) < rowSize.height / 2) {
                     swapRow(rowElem, i);
+                    setSwappedElementsPriority(rowElem.id);
                 }
             }
         }
@@ -137,8 +142,8 @@
             let swappedPriority = getSwappedElementsPriority()[0];
             let draggedPriority = getSwappedElementsPriority()[1];
 
-            console.log(swappedPriority)
-            console.log(draggedPriority)
+            console.log("Swapped", swappedPriority)
+            console.log("Dragged", draggedPriority)
         
             const csrfToken = $('meta[name="csrf-token"]').attr('content');
 
@@ -166,14 +171,13 @@
         
     };
     
-
     const getRows = () => {
         return table.querySelectorAll("tbody tr");
     };
 
     const getTargetRow = (target) => {
         const elemName = target.tagName.toLowerCase();
-
+        setDraggingElementId(target.closest('tr').id)
         if (elemName === "tr") return target;
         if (elemName === "td") return target.closest("tr");
     };
