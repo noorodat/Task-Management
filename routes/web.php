@@ -21,5 +21,5 @@ Route::resource('task', TaskController::class);
 Route::resource('project', ProjectController::class);
 
 // Update priority coming from Ajax request
-Route::post('/update-priority', 'TaskController@updatePriority')->name('update-priority')->middleware('web');
+Route::post('/update-priority', [TaskController::class, 'updatePriority'])->name('update-priority');
 

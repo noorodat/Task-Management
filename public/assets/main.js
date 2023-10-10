@@ -136,6 +136,9 @@
         dragElem.addEventListener("mouseup", () => {
             let swappedPriority = getSwappedElementsPriority()[0];
             let draggedPriority = getSwappedElementsPriority()[1];
+
+            console.log(swappedPriority)
+            console.log(draggedPriority)
         
             const csrfToken = $('meta[name="csrf-token"]').attr('content');
         

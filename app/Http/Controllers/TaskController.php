@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Task;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -62,10 +63,38 @@ class TaskController extends Controller
         $swappedPriority = $request->input('swappedPriority');
         $draggedPriority = $request->input('draggedPriority');
     
-        dd($swappedPriority);
+        $recordWithSwappedPriority = Task::where('priority', $swappedPriority)->first();
+        $recordWithDraggedPriority = Task::where('priority', $draggedPriority)->first();
+    
+        if (!$recordWithDraggedPriority || !$recordWithSwappedPriority) {
+            return response()->json(['message' => 'Invalid priorities provided.']);
+        }
+    
+        // Update the dragged priority to the swapped one
+        $recordWithDraggedPriority->update(['priority' => $swappedPriority]);
+        flash()->addInfo("Number is", $swappedPriority);
+
+        $operation = $draggedPriority > $swappedPriority ? 'add' : 'sub';
+
+        $range = abs($swappedPriority - $draggedPriority);
+
+        if ($operation === 'add') {
+            // Update the priorities of records within the specified range
+            Task::where('priority', '>=', $draggedPriority)
+                ->where('priority', '<=', $swappedPriority)
+                ->where('priority', '!=', $draggedPriority) // Exclude the updated record
+                ->increment('priority', 1);
+        } elseif ($operation === 'sub') {
+            // Update the priorities of records within the specified range
+            Task::where('priority', '>=', $draggedPriority)
+                ->where('priority', '<=', $swappedPriority)
+                ->decrement('priority', 1);
+        }
     
         return response()->json(['message' => 'Priority updated successfully']);
     }
+    
+    
 
     /**
      * Display the specified resource.
