@@ -10,13 +10,15 @@
 
 @if (count($tasks) > 0)
     <div class="tasks p-4">
-        <form action="" class="p-4">
-            <select name="" id="">
-                <option value="">Select a project</option>
-                <option value="">Project1</option>
-                <option value="">Project2</option>
-                <option value="">Project3</option>
+        <form action="{{ route('showTasksBasedOnProjects') }}" class="p-4" method="post">
+            @csrf
+            <label style="display: block" for="show-tasks">Projects</label>
+            <select id="show-tasks" name="project">
+                @foreach ($projects as $project)
+                    <option value="{{ $project->id }}">{{ $project->name }}</option>
+                @endforeach
             </select>
+            <button type="submit">Show Tasks</button>
         </form>
         <table id="table" class="draggable-table table table-dark table-hover text-center">
             <thead>
@@ -33,8 +35,14 @@
                     <td>{{$task->priority}}</td>
                     <td>
                         {{-- {{route('task.edit')}} --}}
-                        <a href="" class="btn btn-primary">Edit</a>
-                        <a href="" class="btn btn-danger">Delete</a>
+                        <div class="actions d-flex justify-content-center gap-3">
+                            <a href="{{route('task.edit', $task)}}" class="btn btn-primary">Edit</a>
+                            <form action="{{route('task.destroy', $task)}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

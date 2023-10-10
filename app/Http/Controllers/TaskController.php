@@ -14,8 +14,9 @@ class TaskController extends Controller
      */
     public function index()
     {
+        $projects = Project::all();
         $tasks = Task::orderBy('priority', 'asc')->get();
-        return view('Task.index', compact('tasks'));
+        return view('Task.index', compact('tasks', 'projects'));
     }
 
     /**
@@ -66,11 +67,12 @@ class TaskController extends Controller
         $recordWithSwappedPriority = Task::where('priority', $swappedPriority)->first();
         $recordWithDraggedPriority = Task::where('priority', $draggedPriority)->first();
     
-        // Get the records in the range
+        // Get the records in the range on -
         $recordsInRangeOnSub = Task::where('priority', '>', $draggedPriority)
         ->where('priority', '<=', $swappedPriority)
         ->get();
 
+        // Get the records in the range on +
         $recordsInRangeOnAdd = Task::where('priority', '<', $draggedPriority)
         ->where('priority', '>=', $swappedPriority)
         ->get();
@@ -93,7 +95,22 @@ class TaskController extends Controller
         return response()->json(['message' => 'Priority updated successfully']);
     }
     
+    public function showTasksBasedOnProjects(Request $request)
+    {
+        $projectId = $request->input('project');
+        $projects = Project::all();
+
+        if($projectId === null) {
+            flash()->addError('Select a project to show');
+            return redirect()->back();
+        }
     
+        // Use Eloquent to retrieve tasks for the selected project
+        $tasks = Task::where('project_id', $projectId)->get();
+    
+        // You can pass $tasks to your view to display them
+        return view('Task.index', compact('tasks', 'projects'));
+    }
 
     /**
      * Display the specified resource.
@@ -108,7 +125,8 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        //
+        $projects = Project::all();
+        return view('Task.edit', compact('task', 'projects'));
     }
 
     /**
@@ -116,7 +134,18 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        //
+        $task_name = $request->input('taskName');
+
+        $project_id = $request->input('projectID');
+
+        $task->update([
+            'name' => $task_name,
+            'project_id' => $project_id,
+        ]);
+
+        flash()->addSuccess("Task updated");
+
+        return redirect()->to('/');
     }
 
     /**
@@ -124,6 +153,19 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
-        //
+        $deletedPriority = $task->priority;
+    
+        // Delete the task
+        $task->delete();
+    
+        // Update the priority (decrease by 1) for all the records below the deleted task
+        Task::where('priority', '>', $deletedPriority)
+            ->decrement('priority');
+    
+        flash()->addSuccess('Task Deleted');
+
+        return redirect()->back();
     }
+
+    
 }

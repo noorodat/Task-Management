@@ -23,3 +23,6 @@ Route::resource('project', ProjectController::class);
 // Update priority coming from Ajax request
 Route::post('/update-priority', [TaskController::class, 'updatePriority'])->name('update-priority');
 
+// Show tasks based on project
+Route::post('/show-tasks', [TaskController::class, 'showTasksBasedOnProjects'])->name('showTasksBasedOnProjects');
+
