@@ -141,6 +141,8 @@
             console.log(draggedPriority)
         
             const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+            console.log(swappedPriority);
         
             // Send an Ajax POST request to the Laravel route
             $.ajax({

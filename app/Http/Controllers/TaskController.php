@@ -69,6 +69,11 @@ class TaskController extends Controller
         if (!$recordWithDraggedPriority || !$recordWithSwappedPriority) {
             return response()->json(['message' => 'Invalid priorities provided.']);
         }
+
+        // Get the records in the range
+        $recordsInRange = Task::where('priority', '>', $draggedPriority)
+        ->where('priority', '<=', $swappedPriority)
+        ->get();
     
         // Update the dragged priority to the swapped one
         $recordWithDraggedPriority->update(['priority' => $swappedPriority]);
@@ -85,10 +90,9 @@ class TaskController extends Controller
                 ->where('priority', '!=', $draggedPriority) // Exclude the updated record
                 ->increment('priority', 1);
         } elseif ($operation === 'sub') {
-            // Update the priorities of records within the specified range
-            Task::where('priority', '>=', $draggedPriority)
-                ->where('priority', '<=', $swappedPriority)
-                ->decrement('priority', 1);
+            $recordsInRange->each(function ($record) {
+                $record->decrement('priority', 1);
+            });
         }
     
         return response()->json(['message' => 'Priority updated successfully']);
